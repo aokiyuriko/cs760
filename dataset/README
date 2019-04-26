@@ -1,0 +1,19 @@
+As discussed the datasets now have 15 features:
+channelGrouping
+fullVisitorId
+visitStartTime
+device_browser
+device_operatingSystem
+geoNetwork_country
+totals_hits
+totals_pageviews
+totals_sessionQualityDim
+totals_timeOnSite
+totals_transactionRevenue
+totals_transactions
+trafficSource_adwordsClickInfo.isVideoAd
+trafficSource_adwordsClickInfo.page
+trafficSource_isTrueDirect
+
+To load pickle files do something like:
+test = pd.read_pickle('test_set.pkl')
