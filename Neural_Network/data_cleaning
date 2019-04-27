@@ -22,14 +22,37 @@ def load_df(csv_path='...', nrows=None):
 
 print(os.listdir("..."))
 
-unwanted_cols = ['customDimensions','hits','visitId','visitNumber','visitStartTime','device.browserSize', 
-                  'device.browserVersion','device.flashVersion','device.language','device.mobileDeviceBranding',
-                  'device.mobileDeviceInfo', 'device.mobileDeviceMarketingName','device.mobileDeviceModel','device.mobileInputSelector',
-                  'device.operatingSystemVersion','device.screenColors', 'device.screenResolution', 'geoNetwork.city','geoNetwork.cityId',
-                  'geoNetwork.latitude', 'geoNetwork.longitude', 'geoNetwork.metro','geoNetwork.networkDomain', 
-                  'geoNetwork.networkLocation','geoNetwork.region', 'geoNetwork.subContinent', 'totals.visits',
-                  'trafficSource.adwordsClickInfo.criteriaParameters', 'trafficSource.adwordsClickInfo.gclId', 
-                  'trafficSource.campaign','trafficSource.referralPath']
+wanted_cols = ['date', 'fullVisitorId','channelGrouping','socialEngagementType','device.browser','device.operatingSystem',
+'geoNetwork.country', 'totals.bounces','totals.hits', 'totals.newVisits', 'totals.pageviews', 'totals.sessionQualityDim', 
+'totals.timeOnSite','totals.transactionRevenue','trafficSource.adwordsClickInfo.isVideoAd', 
+'trafficSource.adwordsClickInfo.page','trafficSource.adwordsClickInfo.slot','trafficSource.isTrueDirect']
+
 
 df = load_df()
-df = df.drop(unwanted_cols,axis=1)
+df = df[df[wanted_cols]
+
+## one hot encoding
+def one_hot(data):
+    categorical = ['channelGrouping','device_browser','device_operatingSystem','geoNetwork_country']
+    boolean = ['trafficSource_adwordsClickInfo.isVideoAd','trafficSource_isTrueDirect']
+    for col in categorical:
+        new = pd.get_dummies(data[col])
+        new.columns = [f"{col}.{subcolumn}" for subcolumn in new.columns]
+        data = data.drop(col, axis=1)
+        data = data.merge(new, right_index=True, left_index=True)
+    for col in boolean:
+        data[col].replace({True:1,False:0},inplace=True)
+    return data
+    
+## ordianal encoding
+def ordinary(data):
+    categorical = ['channelGrouping','device_browser','device_operatingSystem','geoNetwork_country']
+    boolean = ['trafficSource_adwordsClickInfo.isVideoAd','trafficSource_isTrueDirect']
+    for col in categorical:
+        attributes = data[col].unique()
+        d = dict(enumerate(cg,start=1))
+        new = dict((v,k) for k,v in d.items())
+        data[col].replace(new,inplace = True)
+    for col in boolean:
+        data[col].replace({True:1,False:0},inplace=True)
+    return data
